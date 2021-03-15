@@ -1,6 +1,6 @@
 {
   "name": "buildwp",
-  "version": "0.0.5",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koehndesign/wpbuild.git"
+    "url": "git+https://github.com/koehndesign/buildwp.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/koehndesign/wpbuild/issues"
+    "url": "https://github.com/koehndesign/buildwp/issues"
   },
-  "homepage": "https://github.com/koehndesign/wpbuild#readme"
+  "homepage": "https://github.com/koehndesign/buildwp#readme"
 }
