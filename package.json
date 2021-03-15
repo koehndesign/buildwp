@@ -1,0 +1,22 @@
+{
+  "name": "buildwp",
+  "version": "0.0.5",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0"
+  },
+  "bin": {
+    "wpbuild": "bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koehndesign/wpbuild.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/koehndesign/wpbuild/issues"
+  },
+  "homepage": "https://github.com/koehndesign/wpbuild#readme"
+}
