@@ -4,7 +4,7 @@
   <h3 align="center">BuildWP</h3>
 
   <p align="center">
-    flexible build tool for WP projects
+    a flexible build tool for WP projects
     <br />
     <br />
     <a href="https://github.com/koehndesign/buildwp/discussions">Discuss</a>
@@ -14,7 +14,21 @@
     <a href="https://github.com/koehndesign/buildwp/issues">Request Feature</a>
     <br />
     <br />
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/koehndesign/buildwp"> <img alt="Code Climate maintainability" src="https://img.shields.io/codeclimate/maintainability/koehndesign/buildwp"> <img alt="npm" src="https://img.shields.io/npm/dw/buildwp">
+    <a href="https://github.com/koehndesign/buildwp/commits/master">
+      <img src="https://flat.badgen.net/github/last-commit/koehndesign/buildwp" alt="github last commit">
+    </a>
+    <a href="https://www.npmjs.com/package/buildwp">
+      <img src="https://flat.badgen.net/npm/dw/buildwp" alt="npm weekly downloads">
+    </a>
+    <a href="https://www.codacy.com/gh/koehndesign/buildwp/dashboard">
+      <img src="https://flat.badgen.net/codacy/grade/9d802a9bd55b4dd3b269de2a3ede6d21" alt="codacy grade">
+    </a>
+    <a href="https://opensource.org/licenses/MIT">
+      <img src="https://flat.badgen.net/badge/license/MIT/blue" alt="license">
+    </a>
+    <a href="https://www.buymeacoffee.com/koehndesign">
+      <img src="https://flat.badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&label" alt="buy me a coffee">
+    </a>
   </p>
 </p>
 
@@ -64,9 +78,6 @@ To get up and running follow these simple steps.
 ### Prerequisites
 
 - [npm initialized](https://docs.npmjs.com/creating-a-package-json-file#running-a-cli-questionnaire)
-  ```sh
-  npm init
-  ```
 - [composer installed globally](https://getcomposer.org/doc/00-intro.md#globally)
 
 ### Installation
