@@ -38,10 +38,8 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
 
@@ -49,17 +47,14 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`koehndesign`, `buildwp`, `twitter_handle`, `email`, `BuildWP`, `flexible build tool for WP projects`
+A simple, easy to use build tool for WordPress plugins/themes. Handles CSS/JS/PHP, builds to project directory or local dev server, and packages cleanly into a zip file for release.
 
 ### Built With
 
-- []()
-- []()
-- []()
+- [node](https://nodejs.org/)
+- [Composer](https://getcomposer.org/)
+- [esbuild](https://esbuild.github.io/)
+- [PostCSS](https://postcss.org/)
 
 <!-- GETTING STARTED -->
 
@@ -69,49 +64,56 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-
-- npm
+- [npm initialized](https://docs.npmjs.com/creating-a-package-json-file#running-a-cli-questionnaire)
   ```sh
-  npm install npm@latest -g
+  npm init
   ```
+- [composer installed globally](https://getcomposer.org/doc/00-intro.md#globally)
 
 ### Installation
 
-1. Clone the repo
+1. install package
    ```sh
-   git clone https://github.com/koehndesign/buildwp.git
+   npm i -D buildwp
    ```
-2. Install NPM packages
+2. run setup (WARNING - only use on new projects, may override existing files)
    ```sh
-   npm install
+   npx buildwp setup
    ```
 
 <!-- USAGE EXAMPLES -->
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+After running "npx buildwp setup", a very basic folder structure and some default config files will be copied into your project root. Only files/folders added under the "src" directory will be included in the build processes. Your main plugin file or theme functions file should be placed into this "src" folder.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+PHP classes can be included under the "src/app" directory. PSR-4 autoloading of your own classes should be enabled by adding your namespace to the composer.json config as described [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading). The entire contents of the "src/app" directory will be copied to the build destination. All files/folders in the root "src" directory will also be copied, other than "src/scripts" and "src/styles" which are handled by their respective build processes.
+
+JS and CSS builds are handled very similarly. Any ".js" files in "src/styles/index" or ".pcss" files in "src/scripts/index" will be compiled by their respective build tools (esbuild or PostCSS). JS builds are not currently set up to support CSS-in-JS. Feel free to structure common or included files as you want outside of the index directories.
+
+Running "npx buildwp setup" also copies some build scripts into your root package.json file.
+
+- "dev" builds for development and watches everything in the "src" directory for changes
+- "prod" builds for production without watching
+- "release" builds for production, then zips the "dist" directory in the correct folder structure for installation via wp-admin
+  "dev" and "prod" scripts also are available to build directly to your local dev server, but you must first add this plugin directory to the "buildwp.config.js" file.
+  Example:
+
+```sh
+module.exports = {
+  sourceDir: 'src',
+  distDir: 'dist',
+  releaseDir: 'release',
+  // add here...
+  localDevDir: C:/<path-to-wp-plugins-dir>/<your-plugin-dir>
+};
+```
 
 <!-- ROADMAP -->
 
 ## Roadmap
 
 See the [open issues](https://github.com/koehndesign/buildwp/issues) for a list of proposed features (and known issues).
-
-<!-- CONTRIBUTING -->
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 <!-- LICENSE -->
 
@@ -123,14 +125,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email
-
 Project Link: [https://github.com/koehndesign/buildwp](https://github.com/koehndesign/buildwp)
-
-<!-- ACKNOWLEDGEMENTS -->
-
-## Acknowledgements
-
-- []()
-- []()
-- []()
