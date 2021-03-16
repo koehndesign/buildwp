@@ -43,7 +43,7 @@
 
 ## About The Project
 
-A simple, easy to use build tool for WordPress plugins/themes. Handles CSS/JS/PHP, builds to project directory or local dev server, and packages cleanly into a zip file for release.
+A simple, easy to use build tool for WordPress plugins/themes. Handles CSS/JS/PHP, builds to project directory or local dev server, and packages cleanly into a zip file for release and install via wp-admin.
 
 ### Built With
 
@@ -85,7 +85,7 @@ After running "npx buildwp setup", a very basic folder structure and some defaul
 
 PHP classes can be included under the "src/app" directory. PSR-4 autoloading of your own classes should be enabled by adding your namespace to the composer.json config as described [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading). The entire contents of the "src/app" directory will be copied to the build destination. All files/folders in the root "src" directory will also be copied, other than "src/scripts" and "src/styles" which are handled by their respective build processes.
 
-JS and CSS builds are handled very similarly. Any ".js" files in "src/styles/index" or ".pcss" files in "src/scripts/index" will be compiled by their respective build tools (esbuild or PostCSS). JS builds are not currently set up to support CSS-in-JS. Feel free to structure common or included files as you want outside of the index directories.
+JS and CSS builds are handled very similarly. Any ".js" files in "src/styles/index" or ".pcss" files in "src/scripts/index" will be compiled by their respective build tools (esbuild or PostCSS). JS builds are not currently set up to support CSS-in-JS/importing CSS. Feel free to structure common or included files as you want outside of the index directories.
 
 Running "npx buildwp setup" also copies some build scripts into your root package.json file.
 
