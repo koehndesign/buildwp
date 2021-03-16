@@ -89,11 +89,26 @@ JS and CSS builds are handled very similarly. Any ".js" files in "src/styles/ind
 
 Running "npx buildwp setup" also copies some build scripts into your root package.json file.
 
-- "dev" builds for development and watches everything in the "src" directory for changes
-- "prod" builds for production without watching
-- "release" builds for production, then zips the "dist" directory in the correct folder structure for installation via wp-admin
-  "dev" and "prod" scripts also are available to build directly to your local dev server, but you must first add this plugin directory to the "buildwp.config.js" file.
-  Example:
+```sh
+  npm run dev
+```
+
+- builds for development and watches everything in the "src" directory for changes
+
+```sh
+npm run prod
+```
+
+- builds for production without watching
+
+```sh
+npm run release
+```
+
+- builds for production, then zips the "dist" directory in the correct folder structure for installation via wp-admin
+
+"npm run devLocal" and "npm run prodLocal" scripts also are available to build directly to your local dev server, but you must first add your local plugin directory to the "buildwp.config.js" file.
+Example:
 
 ```sh
 module.exports = {
@@ -101,8 +116,8 @@ module.exports = {
   distDir: 'dist',
   releaseDir: 'release',
   // add here...
-  localDevDir: C:/<path-to-wp-plugins-dir>/<your-plugin-dir>
-};
+  localDevDir: C:/<local-dev-server-site>/<path-to-wp-plugins-dir>/<your-plugin-dir>
+}
 ```
 
 <!-- ROADMAP -->
