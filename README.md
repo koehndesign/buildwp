@@ -56,7 +56,7 @@ A simple, easy to use build tool for WordPress plugins/themes. Handles CSS/JS/PH
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps.
+To get up and running follow these simple steps.
 
 ### Prerequisites
 
