@@ -1,13 +1,13 @@
 {
   "name": "buildwp",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "exit 0"
   },
   "bin": {
-    "wpbuild": "bin/cli.js"
+    "buildwp": "bin/buildwp.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,27 @@
   "bugs": {
     "url": "https://github.com/koehndesign/buildwp/issues"
   },
-  "homepage": "https://github.com/koehndesign/buildwp#readme"
+  "homepage": "https://github.com/koehndesign/buildwp#readme",
+  "dependencies": {
+    "archiver": "^5.3.0",
+    "autoprefixer": "^10.2.5",
+    "chalk": "^4.1.0",
+    "chokidar": "^3.5.1",
+    "cross-env": "^7.0.3",
+    "cssnano": "^4.1.10",
+    "esbuild": "^0.8.57",
+    "esbuild-svelte": "^0.4.3",
+    "execa": "^5.0.0",
+    "fs-extra": "^9.1.0",
+    "glob": "^7.1.6",
+    "lodash": "^4.17.21",
+    "postcss": "^8.2.8",
+    "postcss-import": "^14.0.0",
+    "postcss-load-config": "^3.0.1",
+    "postcss-nested": "^5.0.5",
+    "replacestream": "^4.0.3",
+    "run-func": "^1.0.5",
+    "tailwindcss": "^2.0.3",
+    "yargs": "^16.2.0"
+  }
 }
