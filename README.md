@@ -12,10 +12,11 @@
     <a href="https://github.com/koehndesign/buildwp/issues">Report Bug</a>
     ·
     <a href="https://github.com/koehndesign/buildwp/issues">Request Feature</a>
+    <br />
+    <br />
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/koehndesign/buildwp"> <img alt="Code Climate maintainability" src="https://img.shields.io/codeclimate/maintainability/koehndesign/buildwp"> <img alt="npm" src="https://img.shields.io/npm/dw/buildwp">
   </p>
 </p>
-
-![npm](https://img.shields.io/npm/dw/buildwp) ![GitHub](https://img.shields.io/github/license/koehndesign/buildwp) ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/koehndesign/buildwp)
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
