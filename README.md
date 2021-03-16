@@ -15,6 +15,8 @@
   </p>
 </p>
 
+![npm](https://img.shields.io/npm/dw/buildwp) ![GitHub](https://img.shields.io/github/license/koehndesign/buildwp) ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/koehndesign/buildwp)
+
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
