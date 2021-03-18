@@ -180,7 +180,7 @@ async function copyStatic() {
     return;
   })();
   // copy the vendor directory
-  await fse.copy('./vendor', `${dest}/vendor`);
+  await fse.copy('./vendor', `${dest}/vendor`, { dereference: true });
   endMark('copyStatic');
   return;
 }
