@@ -25,12 +25,16 @@ const { hideBin } = require('yargs/helpers');
 const argv = yargs(hideBin(process.argv)).argv;
 // js
 const esbuild = require('esbuild');
-const svelte = require('esbuild-svelte');
+const esbuildrc = (() => {
+  try {
+    return require(path.join(process.cwd(), 'esbuild.config.js'));
+  } catch (e) {
+    return require('../defaults/scaffold/esbuild.config');
+  }
+})();
 // css
 const postcss = require('postcss');
 const postcssrc = require('postcss-load-config');
-
-const production = process.env.NODE_ENV === 'production' ? true : false;
 
 module.exports = {
   setup,
@@ -196,9 +200,12 @@ async function buildJS() {
       entryPoints,
       bundle: true,
       outdir,
-      plugins: [svelte()],
+      plugins: esbuildrc.plugins,
       logLevel: 'info',
-      minify: production ? true : false,
+      define: {
+        'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+      },
+      minify: process.env.NODE_ENV === 'production',
     })
     .catch(() => process.exit(1));
   endMark('buildJS');
@@ -261,11 +268,11 @@ async function setup() {
     './',
   );
   const scripts = {
-    dev: 'buildwp dev',
-    devLocal: 'buildwp dev --dest=local',
-    prod: 'buildwp prod',
-    prodLocal: 'buildwp prod --dest=local',
-    release: 'buildwp release',
+    dev: 'cross-env NODE_ENV=development buildwp dev',
+    devLocal: 'cross-env NODE_ENV=development buildwp dev --dest=local',
+    prod: 'cross-env NODE_ENV=production buildwp prod',
+    prodLocal: 'cross-env NODE_ENV=production buildwp prod --dest=local',
+    release: 'cross-env NODE_ENV=production buildwp release',
   };
   const file = path.join(process.cwd(), 'package.json');
   const data = require(file);
