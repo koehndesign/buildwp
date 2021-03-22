@@ -1,6 +1,6 @@
 {
   "name": "buildwp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -38,7 +38,7 @@
     "postcss-nested": "^5.0.5",
     "replacestream": "^4.0.3",
     "run-func": "^1.0.5",
-    "tailwindcss": "^2.0.3",
+    "tailwindcss": "^2.0.4",
     "yargs": "^16.2.0"
   }
 }
