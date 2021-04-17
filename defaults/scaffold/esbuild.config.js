@@ -1,4 +1,4 @@
-// for svelte - tested and currently working
+// for svelte - production tested
 // const svelte = require('esbuild-svelte');
 
 // for vue 2
