@@ -1,6 +1,6 @@
 {
   "name": "buildwp",
-  "version": "0.2.2",
+  "version": "0.2.3-beta.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -30,14 +30,13 @@
     "esbuild-svelte": "^0.4.3",
     "execa": "^5.0.0",
     "fs-extra": "^9.1.0",
-    "glob": "^7.1.6",
     "lodash": "^4.17.21",
     "postcss": "^8.2.10",
     "postcss-import": "^14.0.1",
     "postcss-load-config": "^3.0.1",
     "postcss-nested": "^5.0.5",
+    "readdirp": "^3.6.0",
     "replacestream": "^4.0.3",
-    "run-func": "^1.0.5",
     "tailwindcss": "^2.1.1",
     "yargs": "^16.2.0"
   }

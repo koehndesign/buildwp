@@ -3,7 +3,8 @@ const { promisify } = require('util');
 const fse = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
-const glob = promisify(require('glob'));
+// const glob = promisify(require('glob'));
+const readdirp = require('readdirp');
 const replace = require('replacestream');
 const archiver = require('archiver');
 const chalk = require('chalk');
@@ -12,26 +13,15 @@ const execa = require('execa');
 const chokidar = require('chokidar');
 // config
 const package = require(path.join(process.cwd(), 'package.json'));
-const config = (() => {
-  try {
-    return require(path.join(process.cwd(), 'buildwp.config.js'));
-  } catch (e) {
-    return require('../defaults/scaffold/buildwp.config');
-  }
-})();
+const config = loadConfig('buildwp.config.js');
+const esbuildrc = loadConfig('esbuild.config.js');
+// const postcssrc = loadConfig('postcss.config.js');
 // args
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const argv = yargs(hideBin(process.argv)).argv;
 // js
 const esbuild = require('esbuild');
-const esbuildrc = (() => {
-  try {
-    return require(path.join(process.cwd(), 'esbuild.config.js'));
-  } catch (e) {
-    return require('../defaults/scaffold/esbuild.config');
-  }
-})();
 // css
 const postcss = require('postcss');
 const postcssrc = require('postcss-load-config');
@@ -42,6 +32,19 @@ module.exports = {
   prod,
   release,
 };
+
+function loadConfig(file) {
+  try {
+    return require(path.join(process.cwd(), file));
+  } catch (e) {
+    console.log(
+      chalk.yellow(
+        `${file} not found or contains errors - loading defaults...`,
+      ),
+    );
+    return require(`../defaults/scaffold/${file}`);
+  }
+}
 
 // performance logging
 function timeStamp() {
@@ -84,18 +87,19 @@ function endMark(name) {
 }
 
 // dynamic directories
-let src = config.sourceDir;
+let src = config.in.src;
 let dest = (() => {
-  if (argv.dest === 'local' && config.hasOwnProperty('localDevDir')) {
-    return config.localDevDir;
+  if (argv.dest === 'local' && config.hasOwnProperty('out.local')) {
+    return config.out.local;
   } else {
-    return config.distDir;
+    return config.out.dist;
   }
 })();
 
 function watcher(input, task) {
   chokidar
-    .watch(input, {
+    .watch(input.pattern, {
+      ignored: input.ignore ?? null,
       ignoreInitial: true,
     })
     .on(
@@ -109,9 +113,10 @@ function watcher(input, task) {
 }
 
 function watch() {
-  watcher(`${src}/{!(scripts|styles)/**,*.*}`, copyStatic);
-  watcher(`${src}/scripts/**/*.*`, buildJS);
-  watcher(`${src}/styles/**/*.*`, buildCSS);
+  console.log(config);
+  watcher(config.glob.static, copyStatic);
+  watcher(config.glob.js, buildJS);
+  watcher(config.glob.css, buildCSS);
   const stamp = timeStamp();
   console.log(`${stamp} watching all files...`);
 }
@@ -130,63 +135,61 @@ async function dumpAutoload() {
   }
 }
 
-// copy static
+/**
+ * copyStatic
+ * runs composer scripts,
+ * recursively copies files/directories under 'src' skipping compiled js and css directories,
+ * and replaces strings in copied files with defined replacements,
+ * then copies composer vendor folder from project root
+ */
 async function copyStatic() {
   startMark('copyStatic');
   // wait for composer to dump autoload
-  await dumpAutoload();
-  const outdir = dest;
+  // await dumpAutoload();
+  // ensure output directory exists
   await fse.ensureDir(dest);
-  // remove all static files and folders from dest, leaving compiled folders 'scripts' & 'styles'
-  await (async () => {
-    const entries = await glob(`${dest}/{!(scripts|styles)/,*.*}`);
-    const promises = [];
-    entries.forEach((entry) => {
-      promises.push(
-        (async (entry) => {
-          await fse.remove(entry);
-        })(entry),
-      );
-    });
-    await Promise.all(promises);
-    return;
-  })();
-  // copy static files and replace placeholder strings
-  await (async () => {
-    const entries = await glob(`${src}/{!(scripts|styles)/**,*.*}`);
-    const promises = [];
-    entries.forEach((entry) => {
-      promises.push(
-        (async (entry) => {
-          const outPath = entry.replace(src, outdir);
-          const stat = await fse.stat(entry);
-          if (stat.isFile()) {
-            await fse.ensureFile(outPath);
-            fse
-              .createReadStream(entry)
-              .pipe(replace('{_name_}', package.name))
-              .pipe(replace('{_displayName_}', package.displayName))
-              .pipe(replace('{_link_}', package.link))
-              .pipe(replace('{_description_}', package.description))
-              .pipe(replace('{_version_}', package.version))
-              .pipe(replace('{_author_}', package.author))
-              .pipe(replace('{_author_uri_}', package.authorURL))
-              .pipe(replace('{_license_}', package.license))
-              .pipe(replace('{_license_uri_}', package.licenseURL))
-              .pipe(fse.createWriteStream(outPath));
-          } else {
-            await fse.ensureDir(outPath);
-          }
-        })(entry),
-      );
-    });
-    await Promise.all(promises);
-    return;
-  })();
+  // remove all static files and folders from dest
+  for await (const entry of await fse.opendir(dest)) {
+    // skip compiled dirs
+    if (entry.name == config.out.js || entry.name == config.out.css) continue;
+    // remove the entry
+    await fse.remove(path.join(dest, entry.name));
+  }
+  // replacement string sets
+  const replaceStrings = config.replace ?? [];
+  // replacement string functions
+  const replaceFunctions = replaceStrings.map((set) => {
+    return () => replace(set[0], set[1]);
+  });
+  // stream the static dir
+  for await (const entry of readdirp(src, {
+    type: 'files_directories',
+    directoryFilter: (entry) =>
+      path.dirname(entry.path) != config.in.js &&
+      path.dirname(entry.path) != config.in.css,
+  })) {
+    if (entry.dirent.isFile()) {
+      // handle files
+      const srcPath = path.join(src, entry.path);
+      const outPath = path.join(dest, entry.path);
+      // create output file
+      await fse.ensureFile(outPath);
+      // stream input file
+      let stream = fse.createReadStream(srcPath);
+      // loop through all replacements pipe functions
+      for (const replaceFunction of replaceFunctions) {
+        stream = stream.pipe(replaceFunction());
+      }
+      // write to output file
+      stream.pipe(fse.createWriteStream(outPath));
+    } else {
+      // handle dirs
+      await fse.ensureDir(path.join(dest, entry.path));
+    }
+  }
   // copy the vendor directory
-  await fse.copy('./vendor', `${dest}/vendor`, { dereference: true });
+  await fse.copy('vendor', path.join(dest, 'vendor'), { dereference: true });
   endMark('copyStatic');
-  return;
 }
 
 // build js
@@ -214,33 +217,58 @@ async function buildJS() {
 
 async function buildCSS() {
   startMark('buildCSS');
-  const outdir = path.join(dest, 'styles');
-  await fse.emptyDir(outdir);
-  const entries = await glob(`${src}/styles/index/*.pcss`);
-  const { plugins } = await postcssrc();
-  const promises = [];
-  entries.forEach((entry) => {
-    promises.push(
-      (async (file) => {
-        const name = path.parse(file).name;
-        const outPath = `${outdir}/${name}.css`;
-        const content = await fse.readFile(file);
-        const result = await postcss(plugins).process(content, {
-          from: file,
-          to: outPath,
-        });
-        fse.writeFile(outPath, result.css, () => true);
-        if (result.map) {
-          fse.writeFile(
-            `${outdir}/${name}.css.map`,
-            result.map.toString(),
-            () => true,
-          );
-        }
-      })(entry),
-    );
-  });
-  await Promise.all(promises);
+  await fse.emptyDir(path.join(dest, config.out.css));
+  for await (entry of readdirp(path.join(src, config.in.css, 'index'), {
+    type: 'files_directories',
+  })) {
+    if (entry.dirent.isFile()) {
+      // handle files
+      const info = path.parse(entry.path);
+      const srcPath = entry.fullPath;
+      const outDir = path.join(dest, info.dir);
+      const outPath = path.join(outDir, info.name + '.css');
+      const content = await fse.readFile(srcPath);
+      const { plugins } = await postcssrc();
+      const processed = await postcss(plugins).process(content, {
+        from: srcPath,
+        to: outPath,
+      });
+      fse.writeFile(outPath, processed.css, () => true);
+      if (processed.map) {
+        const mapOutPath = path.join(outDir, info.name + '.css.map');
+        fse.writeFile(mapOutPath, processed.map.css, () => true);
+      }
+    } else {
+      // handle dirs
+      await fse.ensureDir(path.join(dest, entry.path));
+    }
+  }
+
+  // const entries = await glob(`${src}/styles/index/*.pcss`);
+  // const { plugins } = await postcssrc();
+  // const promises = [];
+  // entries.forEach((entry) => {
+  //   promises.push(
+  //     (async (file) => {
+  //       const name = path.parse(file).name;
+  //       const outPath = `${outdir}/${name}.css`;
+  //       const content = await fse.readFile(file);
+  //       const result = await postcss(plugins).process(content, {
+  //         from: file,
+  //         to: outPath,
+  //       });
+  //       fse.writeFile(outPath, result.css, () => true);
+  //       if (result.map) {
+  //         fse.writeFile(
+  //           `${outdir}/${name}.css.map`,
+  //           result.map.toString(),
+  //           () => true,
+  //         );
+  //       }
+  //     })(entry),
+  //   );
+  // });
+  // await Promise.all(promises);
   endMark('buildCSS');
   return;
 }
@@ -248,13 +276,13 @@ async function buildCSS() {
 // zip the dist folder
 async function zip() {
   startMark('zip');
-  await fse.mkdirs('./release');
+  await fse.mkdirs(config.dir.release);
   const output = fse.createWriteStream(
-    `./release/${package.name}-${package.version}.zip`,
+    `${config.dir.release}/${package.name}-${package.version}.zip`,
   );
   const archive = archiver('zip', { zlib: { level: 9 } });
   archive.pipe(output);
-  archive.directory('./dist', package.name);
+  archive.directory(config.dir.dist, package.name);
   archive.finalize();
   endMark('zip');
   return;
@@ -269,9 +297,9 @@ async function setup() {
   );
   const scripts = {
     dev: 'cross-env NODE_ENV=development buildwp dev',
-    devLocal: 'cross-env NODE_ENV=development buildwp dev --dest=local',
+    'dev:local': 'cross-env NODE_ENV=development buildwp dev --dest=local',
     prod: 'cross-env NODE_ENV=production buildwp prod',
-    prodLocal: 'cross-env NODE_ENV=production buildwp prod --dest=local',
+    'prod:local': 'cross-env NODE_ENV=production buildwp prod --dest=local',
     release: 'cross-env NODE_ENV=production buildwp release',
   };
   const file = path.join(process.cwd(), 'package.json');
@@ -284,9 +312,10 @@ async function setup() {
 // TASK - development build to output folder
 async function dev() {
   startMark('dev');
-  await Promise.all([copyStatic(), buildJS(), buildCSS()]);
+  // await Promise.all([copyStatic(), buildJS(), buildCSS()]);
+  await Promise.all([copyStatic(), buildCSS()]);
   endMark('dev');
-  watch();
+  // watch();
   return;
 }
 
@@ -302,7 +331,7 @@ async function prod() {
 async function release() {
   startMark('release');
   // override dest directory
-  dest = config.distDir;
+  dest = config.dir.dist;
   await prod();
   await zip();
   endMark('release');
