@@ -167,8 +167,7 @@ const copyStatic = () =>
     for await (const entry of readdirp(src, {
       type: 'files_directories',
       directoryFilter: (entry) =>
-        path.dirname(entry.path) != config.in.js &&
-        path.dirname(entry.path) != config.in.css,
+        entry.path != config.in.js && entry.path != config.in.css,
     })) {
       if (entry.dirent.isFile()) {
         // handle files
@@ -196,11 +195,11 @@ const copyStatic = () =>
 // TASK - build js
 const buildJS = () =>
   task('buildJS', async () => {
-    const outdir = path.join(dest, 'scripts');
+    const outdir = path.join(dest, config.out.js);
     await fse.emptyDir(outdir);
     const entryPoints = [];
     for await (entry of readdirp(path.join(src, config.in.js, 'index'))) {
-      entryPoints.push(path.join(src, config.in.js, 'index', entry.path));
+      entryPoints.push(path.join('./', src, config.in.js, 'index', entry.path));
     }
     await esbuild
       .build({
@@ -228,7 +227,7 @@ const buildCSS = () =>
         // handle files
         const info = path.parse(entry.path);
         const srcPath = entry.fullPath;
-        const outDir = path.join(dest, info.dir);
+        const outDir = path.join(dest, config.out.css, info.dir);
         const outPath = path.join(outDir, info.name + '.css');
         const content = await fse.readFile(srcPath);
         const { plugins } = await postcssrc();
@@ -243,7 +242,7 @@ const buildCSS = () =>
         }
       } else {
         // handle dirs
-        await fse.ensureDir(path.join(dest, entry.path));
+        await fse.ensureDir(path.join(dest, config.out.css, entry.path));
       }
     }
   });
@@ -251,13 +250,13 @@ const buildCSS = () =>
 // TASK - zip the dist folder
 const zip = () =>
   task('zip', async () => {
-    await fse.mkdirs(config.dir.release);
+    await fse.mkdirs(config.out.release);
     const output = fse.createWriteStream(
-      `${config.dir.release}/${package.name}-${package.version}.zip`,
+      `${config.out.release}/${package.name}-${package.version}.zip`,
     );
     const archive = archiver('zip', { zlib: { level: 9 } });
     archive.pipe(output);
-    archive.directory(config.dir.dist, package.name);
+    archive.directory(config.out.dist, package.name);
     archive.finalize();
   });
 
