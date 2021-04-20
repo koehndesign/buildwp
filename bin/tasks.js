@@ -1,5 +1,4 @@
 // utils
-const { promisify } = require('util');
 const fse = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
@@ -14,14 +13,13 @@ const chokidar = require('chokidar');
 // config
 const package = require(path.join(process.cwd(), 'package.json'));
 const config = loadConfig('buildwp.config.js');
-const esbuildrc = loadConfig('esbuild.config.js');
-// const postcssrc = loadConfig('postcss.config.js');
 // args
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const argv = yargs(hideBin(process.argv)).argv;
 // js
 const esbuild = require('esbuild');
+const esbuildrc = loadConfig('esbuild.config.js');
 // css
 const postcss = require('postcss');
 const postcssrc = require('postcss-load-config');
@@ -84,7 +82,7 @@ async function task(name, func) {
 // dynamic directories
 let src = config.in.src;
 let dest = (() => {
-  if (argv.dest === 'local' && config.hasOwnProperty('out.local')) {
+  if (argv.dest === 'local') {
     return config.out.local;
   } else {
     return config.out.dist;
