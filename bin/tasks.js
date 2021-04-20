@@ -77,6 +77,7 @@ async function task(name, func) {
   performance.measure(name, `${name}start`, `${name}end`);
   performance.clearMarks(`${name}start`);
   performance.clearMarks(`${name}end`);
+  return;
 }
 
 // dynamic directories
@@ -121,8 +122,8 @@ function watch() {
       pattern: cssPath,
     },
   };
-  watcher(inputs.static, copyStatic);
-  watcher(inputs.js, buildJS);
+  watcher(inputs.static, () => Promise.all([copyStatic(), buildCSS()]));
+  watcher(inputs.js, () => Promise.all([buildJS(), buildCSS()]));
   watcher(inputs.css, buildCSS);
   console.log(`${timeStamp()} watching all files...`);
 }
@@ -280,9 +281,8 @@ const setup = () =>
 
 // TASK - development build to output folder
 const dev = async () => {
-  await task(
-    'dev',
-    async () => await Promise.all([copyStatic(), buildJS(), buildCSS()]),
+  await task('dev', async () =>
+    Promise.all([copyStatic(), buildJS(), buildCSS()]),
   );
   watch();
   return;
@@ -290,10 +290,7 @@ const dev = async () => {
 
 // TASK - production build to output folder
 const prod = () =>
-  task(
-    'prod',
-    async () => await Promise.all([copyStatic(), buildJS(), buildCSS()]),
-  );
+  task('prod', () => Promise.all([copyStatic(), buildJS(), buildCSS()]));
 
 // TASK - production build then zip for release
 const release = () =>

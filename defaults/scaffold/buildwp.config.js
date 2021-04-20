@@ -9,6 +9,7 @@ module.exports = {
   out: {
     dist: 'dist',
     local: '<path-to-local-wp-install>/wp-content/plugins/<your-project>',
+    release: 'release',
     js: 'scripts',
     css: 'styles',
   },
