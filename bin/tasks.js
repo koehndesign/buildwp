@@ -259,26 +259,6 @@ const zip = () =>
     archive.finalize();
   });
 
-// TASK - scaffold WP project
-const setup = () =>
-  task('setup', async () => {
-    await fse.copy(
-      path.join(path.dirname(require.main.path), 'defaults', 'scaffold'),
-      './',
-    );
-    const scripts = {
-      dev: 'cross-env NODE_ENV=development buildwp dev',
-      'dev:local': 'cross-env NODE_ENV=development buildwp dev --dest=local',
-      prod: 'cross-env NODE_ENV=production buildwp prod',
-      'prod:local': 'cross-env NODE_ENV=production buildwp prod --dest=local',
-      release: 'cross-env NODE_ENV=production buildwp release',
-    };
-    const file = path.join(process.cwd(), 'package.json');
-    const data = require(file);
-    data.scripts = { ...data.scripts, ...scripts };
-    await fse.writeJSON(file, data, { spaces: 2 });
-  });
-
 // TASK - development build to output folder
 const dev = async () => {
   await task('dev', async () =>
@@ -301,7 +281,6 @@ const release = () =>
   });
 
 module.exports = {
-  setup,
   dev,
   prod,
   release,
