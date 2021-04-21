@@ -1,4 +1,5 @@
 const fse = require('fs-extra');
+const path = require('path');
 
 const setup = async () => {
   console.log('buildwp: starting setup...');
