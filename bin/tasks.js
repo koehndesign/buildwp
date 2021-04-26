@@ -1,6 +1,7 @@
 // utils
 const fse = require('fs-extra');
 const path = require('path');
+const os = require('os');
 const _ = require('lodash');
 // const glob = promisify(require('glob'));
 const readdirp = require('readdirp');
@@ -82,13 +83,7 @@ async function task(name, func) {
 
 // dynamic directories
 let src = config.in.src;
-let dest = (() => {
-  if (argv.dest === 'local') {
-    return config.out.local;
-  } else {
-    return config.out.dist;
-  }
-})();
+let dest = argv.dest === 'local' ? config.out.local : config.out.dist;
 
 // watcher function
 function watcher(input, task) {
@@ -128,25 +123,42 @@ function watch() {
   console.log(`${timeStamp()} watching all files...`);
 }
 
-// composer dump autoload
-async function dumpAutoload() {
-  // requires composer in system path
+// TASK - composer install to dest
+// NOTICE - requires composer.phar in system path!
+async function composerInstall() {
+  // check if enabled first
+  if (!config.composerInstall) return;
+  // copy composer config and lock files
+  const files = ['composer.json', 'composer.lock'];
+  files.forEach((file) => {
+    fse.copy(file, `${dest}/${file}`).catch((err) => {
+      console.log(
+        chalk.red(`${file} file not found in project root - exiting...`),
+      );
+      process.exit(1);
+    });
+  });
+  // set up command
+  const optimize = process.env.NODE_ENV === 'production' ? '-o' : '';
+  const outputDir = dest.replace(/(\s+)/g, '\\$1');
+  const dirOption = (os.type() === 'Windows_NT' ? '-d ' : '-d=') + outputDir;
+  const command = `composer install ${dirOption} ${optimize}`;
+  // run command
   try {
-    const { stdout, stderr } = await execa.command('composer dumpautoload');
-    console.log(chalk.blue('>>> composer:dumpautoload'));
+    console.log(chalk.blue('>>> ' + command));
+    const { stdout, stderr } = await execa.command(command);
     if (stderr) console.log(chalk.red(stderr));
     if (stdout) console.log(chalk.blue(stdout));
-    console.log(chalk.blue('<<< composer:dumpautoload'));
+    console.log(chalk.blue('<<< composer end'));
   } catch (error) {
     console.log(chalk.red(error));
   }
+  return;
 }
 
 // TASK - copy static files
 const copyStatic = () =>
   task('copyStatic', async () => {
-    // wait for composer to dump autoload
-    await dumpAutoload();
     // ensure output directory exists
     await fse.ensureDir(dest);
     // remove all static files and folders from dest
@@ -187,8 +199,8 @@ const copyStatic = () =>
         await fse.ensureDir(path.join(dest, entry.path));
       }
     }
-    // copy the vendor directory
-    await fse.copy('vendor', path.join(dest, 'vendor'), { dereference: true });
+    // run composer install
+    await composerInstall();
   });
 
 // TASK - build js
