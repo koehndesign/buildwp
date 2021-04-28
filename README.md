@@ -86,7 +86,7 @@ To get up and running follow these simple steps.
    ```sh
    npm i -D buildwp
    ```
-2. run setup (WARNING - only use on new projects, may override existing files)
+2. run setup
    ```sh
    npx buildwp setup
    ```
@@ -99,7 +99,9 @@ After running "npx buildwp setup", a very basic folder structure and some defaul
 
 PHP classes can be included under the "src/app" directory. PSR-4 autoloading of your own classes should be enabled by adding your namespace to the composer.json config as described [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading). The entire contents of the "src/app" directory will be copied to the build destination. All files/folders in the root "src" directory will also be copied, other than "src/scripts" and "src/styles" which are handled by their respective build processes.
 
-JS and CSS builds are handled very similarly. Any ".js" files in "src/styles/index" or ".pcss" files in "src/scripts/index" will be compiled by their respective build tools (esbuild or PostCSS). JS builds are not currently set up to support CSS-in-JS/importing CSS. Feel free to structure common or included files as you want outside of the index directories.
+JS and CSS builds are handled very similarly. Any files in "src/scripts/index" or "src/styles/index" will be compiled by their respective build tools (esbuild or PostCSS). Folder structures under index directories will be respected in the output directory. Feel free to structure common or included files as you want outside of the index directories.
+
+NOTE: Currently, the JS build task is not set up to support CSS-in-JS/importing CSS in javascript files.
 
 Running "npx buildwp setup" also copies some build scripts into your root package.json file.
 
@@ -133,7 +135,8 @@ module.exports = {
   },
   out: {
     dist: 'dist',
-    local: '<path-to-local-wp-install>/wp-content/plugins/<your-project>', // add path to your local dev server and plugin/theme file here
+    // add path to your local dev server and plugin/theme file here
+    local: '<path-to-local-wp-install>/wp-content/plugins/<your-project>',
 ```
 
 UPDATE:
