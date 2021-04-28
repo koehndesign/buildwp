@@ -86,7 +86,7 @@ let src = config.in.src;
 let dest = argv.dest === 'local' ? config.out.local : config.out.dist;
 
 // watcher function
-function watcher(input, task) {
+function watcher(input, func) {
   chokidar
     .watch(input.pattern, {
       ignored: input.ignore ?? null,
@@ -95,7 +95,7 @@ function watcher(input, task) {
     .on(
       'all',
       _.debounce(async (event, path) => {
-        await task();
+        await func();
         console.log(`${timeStamp()} watching all files...`);
       }, 300),
     );
