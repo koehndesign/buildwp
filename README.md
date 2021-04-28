@@ -99,7 +99,7 @@ After running "npx buildwp setup", a very basic folder structure and some defaul
 
 PHP classes can be included under the "src/app" directory. PSR-4 autoloading of your own classes should be enabled by adding your namespace to the composer.json config as described [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading). The entire contents of the "src/app" directory will be copied to the build destination. All files/folders in the root "src" directory will also be copied, other than "src/scripts" and "src/styles" which are handled by their respective build processes. If you aren't using any vendor packages or PSR-4 autoloading classes, you can shorten build times by disabling the composer install task in your buildwp.config.js file.
 
-```
+```sh
 composerInstall: false,
 ```
 
@@ -109,23 +109,23 @@ NOTE: Currently, the JS build task is not set up to support CSS-in-JS/importing 
 
 Running "npx buildwp setup" also copies some build scripts into your root package.json file.
 
-```sh
-  npm run dev
-```
-
 - builds for development and watches everything in the "src" directory for changes
 
 ```sh
-npm run prod
+npm run dev
 ```
 
 - builds for production without watching
 
 ```sh
-npm run release
+npm run prod
 ```
 
 - builds for production, then zips the "dist" directory in the correct folder structure for installation via wp-admin
+
+```sh
+npm run release
+```
 
 "npm run dev:local" and "npm run prod:local" scripts also are available to build directly to your local dev server, but you must first add your local plugin directory to the "buildwp.config.js" file.
 Example:
