@@ -137,7 +137,7 @@ module.exports = {
 ```
 
 UPDATE:
-String replacement is now supported on static files (PHP, readme, etc.). This allows you to replace hardcoded strings with placeholders that will be found and updated at build time. Handy for versions and other boilerplate data required by themes/plugins. For an example of pulling some of this info from the root package.json file, see the included example config file included at /defaults/scaffold/buildwp.config.js.
+String replacement is now supported on static files (PHP, readme, etc.). This allows you to replace hardcoded strings with placeholders that will be found and updated at build time. Handy for versions and other boilerplate data required by themes/plugins. For an example of pulling some of this info from the root package.json file, see the included example [config file](https://github.com/koehndesign/buildwp/blob/master/defaults/scaffold/buildwp.config.js).
 
 <!-- ROADMAP -->
 
