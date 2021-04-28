@@ -97,7 +97,11 @@ To get up and running follow these simple steps.
 
 After running "npx buildwp setup", a very basic folder structure and some default config files will be copied into your project root. Only files/folders added under the "src" directory will be included in the build processes. Your main plugin file or theme functions file should be placed into this "src" folder.
 
-PHP classes can be included under the "src/app" directory. PSR-4 autoloading of your own classes should be enabled by adding your namespace to the composer.json config as described [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading). The entire contents of the "src/app" directory will be copied to the build destination. All files/folders in the root "src" directory will also be copied, other than "src/scripts" and "src/styles" which are handled by their respective build processes.
+PHP classes can be included under the "src/app" directory. PSR-4 autoloading of your own classes should be enabled by adding your namespace to the composer.json config as described [here](https://getcomposer.org/doc/01-basic-usage.md#autoloading). The entire contents of the "src/app" directory will be copied to the build destination. All files/folders in the root "src" directory will also be copied, other than "src/scripts" and "src/styles" which are handled by their respective build processes. If you aren't using any vendor packages or PSR-4 autoloading classes, you can shorten build times by disabling the composer install task in your buildwp.config.js file.
+
+```
+composerInstall: false,
+```
 
 JS and CSS builds are handled very similarly. Any files in "src/scripts/index" or "src/styles/index" will be compiled by their respective build tools (esbuild or PostCSS). Folder structures under index directories will be respected in the output directory. Feel free to structure common or included files as you want outside of the index directories.
 
@@ -127,16 +131,10 @@ npm run release
 Example:
 
 ```sh
-module.exports = {
-  in: {
-    src: 'src',
-    js: 'scripts',
-    css: 'styles',
-  },
-  out: {
-    dist: 'dist',
-    // add path to your local dev server and plugin/theme file here
-    local: '<path-to-local-wp-install>/wp-content/plugins/<your-project>',
+out: {
+  dist: 'dist',
+  // add path to your local dev server and plugin/theme file here
+  local: '<path-to-local-wp-install>/wp-content/plugins/<your-project>',
 ```
 
 UPDATE:

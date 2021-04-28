@@ -24,4 +24,5 @@ module.exports = {
     ['{_license_}', package.license],
     ['{_license_uri_}', package.licenseURL],
   ],
+  composerInstall: true,
 };
