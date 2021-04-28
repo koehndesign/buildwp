@@ -121,18 +121,23 @@ npm run release
 
 - builds for production, then zips the "dist" directory in the correct folder structure for installation via wp-admin
 
-"npm run devLocal" and "npm run prodLocal" scripts also are available to build directly to your local dev server, but you must first add your local plugin directory to the "buildwp.config.js" file.
+"npm run dev:local" and "npm run prod:local" scripts also are available to build directly to your local dev server, but you must first add your local plugin directory to the "buildwp.config.js" file.
 Example:
 
 ```sh
 module.exports = {
-  sourceDir: 'src',
-  distDir: 'dist',
-  releaseDir: 'release',
-  // add here...
-  localDevDir: C:/<local-dev-server-site>/<path-to-wp-plugins-dir>/<your-plugin-dir>
-}
+  in: {
+    src: 'src',
+    js: 'scripts',
+    css: 'styles',
+  },
+  out: {
+    dist: 'dist',
+    local: '<path-to-local-wp-install>/wp-content/plugins/<your-project>', // add path to your local dev server and plugin/theme file here
 ```
+
+UPDATE:
+String replacement is now supported on static files (PHP, readme, etc.). This allows you to replace hardcoded strings with placeholders that will be found and updated at build time. Handy for versions and other boilerplate data required by themes/plugins. For an example of pulling some of this info from the root package.json file, see the included example config file included at /defaults/scaffold/buildwp.config.js.
 
 <!-- ROADMAP -->
 
