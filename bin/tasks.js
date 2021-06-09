@@ -142,7 +142,7 @@ async function composerInstall() {
   const optimize = process.env.NODE_ENV === 'production' ? '-o' : '';
   const outputDir = dest.replace(/(\s+)/g, '\\$1');
   const dirOption = (os.type() === 'Windows_NT' ? '-d ' : '-d=') + outputDir;
-  const command = `composer install ${dirOption} ${optimize}`;
+  const command = `composer install ${dirOption} ${optimize} --no-dev`;
   // run command
   try {
     console.log(chalk.blue('>>> ' + command));
