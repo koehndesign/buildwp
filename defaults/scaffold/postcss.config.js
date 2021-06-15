@@ -4,6 +4,6 @@ module.exports = ({ env }) => ({
     require('postcss-nested'),
     require('tailwindcss'),
     require('autoprefixer'),
-    env === 'production' ? require('postcss-clean')() : false,
+    env === 'production' ? require('cssnano')() : false,
   ],
 });
